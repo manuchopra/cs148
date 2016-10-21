@@ -8,9 +8,9 @@
 #include "assimp/material.h"
 
 std::array<const char*, 3> EpicShader::MATERIAL_PROPERTY_NAMES = {
-    "InputMaterial.matDiffuse", 
+    "InputMaterial.matRoughness",
     "InputMaterial.matSpecular", 
-    "InputMaterial.matShininess"
+    "InputMaterial.matMetallic"
     
 };
 const int EpicShader::MATERIAL_BINDING_POINT = 0;
@@ -84,9 +84,14 @@ void EpicShader::UpdateMaterialBlock() const
 {
     StartUseShader();
 
+//    memcpy((void*)(materialStorage.data() + materialOffsets[0]), glm::value_ptr(diffuse), sizeof(glm::vec4));
+//    memcpy((void*)(materialStorage.data() + materialOffsets[1]), glm::value_ptr(specular), sizeof(glm::vec4));
+//    memcpy((void*)(materialStorage.data() + materialOffsets[2]), &shininess, sizeof(float));
+//    
     memcpy((void*)(materialStorage.data() + materialOffsets[0]), glm::value_ptr(diffuse), sizeof(glm::vec4));
     memcpy((void*)(materialStorage.data() + materialOffsets[1]), glm::value_ptr(specular), sizeof(glm::vec4));
     memcpy((void*)(materialStorage.data() + materialOffsets[2]), &shininess, sizeof(float));
+
 
     if (materialBuffer && materialBlockLocation != GL_INVALID_INDEX) {
         OGL_CALL(glBindBuffer(GL_UNIFORM_BUFFER, materialBuffer));
