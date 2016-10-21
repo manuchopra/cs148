@@ -16,7 +16,10 @@ std::array<const char*, 3> EpicShader::MATERIAL_PROPERTY_NAMES = {
 const int EpicShader::MATERIAL_BINDING_POINT = 0;
 
 EpicShader::EpicShader(const std::unordered_map<GLenum, std::string>& inputShaders, GLenum lightingStage):
-    ShaderProgram(inputShaders), diffuse(glm::vec3(0.f), 1.f), specular(glm::vec3(0.f), 1.f), shininess(1.f), ambient(glm::vec3(0.1f), 1.f), 
+    ShaderProgram(inputShaders), roughness(1.f), specular(1.f), metallic(1.f),
+
+//ShaderProgram(inputShaders), diffuse(glm::vec3(0.f), 1.f), specular(glm::vec3(0.f), 1.f), shininess(1.f), ambient(glm::vec3(0.1f), 1.f),
+
     materialBlockLocation(0), materialBlockSize(0), materialBuffer(0),
     lightingShaderStage(lightingStage), maxDisplacement(0.5f)
 {
@@ -88,9 +91,9 @@ void EpicShader::UpdateMaterialBlock() const
 //    memcpy((void*)(materialStorage.data() + materialOffsets[1]), glm::value_ptr(specular), sizeof(glm::vec4));
 //    memcpy((void*)(materialStorage.data() + materialOffsets[2]), &shininess, sizeof(float));
 //    
-    memcpy((void*)(materialStorage.data() + materialOffsets[0]), glm::value_ptr(diffuse), sizeof(glm::vec4));
-    memcpy((void*)(materialStorage.data() + materialOffsets[1]), glm::value_ptr(specular), sizeof(glm::vec4));
-    memcpy((void*)(materialStorage.data() + materialOffsets[2]), &shininess, sizeof(float));
+    memcpy((void*)(materialStorage.data() + materialOffsets[0]), &roughness, sizeof(float));
+    memcpy((void*)(materialStorage.data() + materialOffsets[1]), &specular, sizeof(float));
+    memcpy((void*)(materialStorage.data() + materialOffsets[2]), &metallic, sizeof(float));
 
 
     if (materialBuffer && materialBlockLocation != GL_INVALID_INDEX) {
@@ -165,24 +168,42 @@ void EpicShader::SetupShaderCamera(const class Camera* camera) const
     SetShaderUniform("cameraPosition", camera->GetPosition());
 }
 
-void EpicShader::SetDiffuse(glm::vec4 inDiffuse) 
+void EpicShader::SetRoughness(float inRoughness)
 { 
-    diffuse = inDiffuse; 
+    roughness = inRoughness;
     UpdateMaterialBlock();
 }
 
-void EpicShader::SetSpecular(glm::vec4 inSpecular, float inShininess) 
+void EpicShader::SetSpecular(float inSpecular)
 { 
     specular = inSpecular; 
-    shininess = inShininess;
     UpdateMaterialBlock();
 }
 
-void EpicShader::SetAmbient(glm::vec4 inAmbient) 
+void EpicShader::SetMetallic(float inMetallic)
 { 
-    ambient = inAmbient; 
+    metallic = inMetallic;;
     UpdateMaterialBlock();
 }
+
+//void EpicShader::SetRoughness(glm::vec4 inRoughness)
+//{
+//    diffuse = inDiffuse;
+//    UpdateMaterialBlock();
+//}
+//
+//void EpicShader::SetSpecular(glm::vec4 inSpecular, float inShininess)
+//{
+//    specular = inSpecular;
+//    shininess = inShininess;
+//    UpdateMaterialBlock();
+//}
+//
+//void EpicShader::SetAmbient(glm::vec4 inAmbient)
+//{
+//    ambient = inAmbient;
+//    UpdateMaterialBlock();
+//}
 
 void EpicShader::SetTexture(TextureSlots::Type slot, std::shared_ptr<class Texture> inputTexture)
 {
@@ -200,10 +221,10 @@ void EpicShader::LoadMaterialFromAssimp(std::shared_ptr<aiMaterial> assimpMateri
         return;
     }
 
-    assimpMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, glm::value_ptr(diffuse), nullptr);
-    assimpMaterial->Get(AI_MATKEY_COLOR_SPECULAR, glm::value_ptr(specular), nullptr);
-    assimpMaterial->Get(AI_MATKEY_SHININESS, &shininess, nullptr);
-    assimpMaterial->Get(AI_MATKEY_COLOR_AMBIENT, glm::value_ptr(ambient), nullptr);
+    assimpMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, &roughness, nullptr);
+    assimpMaterial->Get(AI_MATKEY_COLOR_SPECULAR, &specular, nullptr);
+    assimpMaterial->Get(AI_MATKEY_SHININESS, &metallic, nullptr);
+//    assimpMaterial->Get(AI_MATKEY_COLOR_AMBIENT, glm::value_ptr(ambient), nullptr);
 
     if (assimpMaterial->GetTextureCount(aiTextureType_DIFFUSE)) {
         aiString aiDiffusePath;

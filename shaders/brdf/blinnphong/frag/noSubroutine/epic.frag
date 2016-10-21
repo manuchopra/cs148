@@ -52,10 +52,10 @@ vec4 pointLightSubroutine(vec4 worldPosition, vec3 worldNormal)
 
     // Amount of diffuse reflection
     float d = max(0, dot(N, L));
-    vec4 diffuseColor = d * genericLight.diffuseColor * material.matDiffuse;
+    vec4 diffuseColor = d * genericLight.diffuseColor * material.matRoughness;
     
     // Amount of specular reflection
-    float s = pow(max(0, dot(N, H)), material.matShininess);
+    float s = pow(max(0, dot(N, H)), material.matSpecular);
     vec4 specularColor = s * genericLight.specularColor * material.matSpecular;
 
     return diffuseColor + specularColor;
