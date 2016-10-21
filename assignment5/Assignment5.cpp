@@ -120,8 +120,7 @@ void Assignment5::SetupExample1()
     shader->SetMaxDisplacement(0.1f);
 
     std::unique_ptr<LightProperties> lightProperties = make_unique<LightProperties>();
-    lightProperties->diffuseColor = glm::vec4(1.f, 1.f, 1.f, 1.f);
-    lightProperties->specularColor = glm::vec4(1.f, 1.f, 1.f, 1.f);
+    lightProperties->cLight = glm::vec4(1.f, 1.f, 1.f, 1.f);
 
     std::shared_ptr<Light> pointLight = std::make_shared<Light>(std::move(lightProperties));
     pointLight->SetPosition(glm::vec3(10.f, 10.f, 10.f));
@@ -173,8 +172,7 @@ void Assignment5::SetupExample2()
     };
 #endif
     std::unique_ptr<LightProperties> lightProperties = make_unique<LightProperties>();
-    lightProperties->diffuseColor = glm::vec4(1.f, 1.f, 1.f, 1.f);
-    lightProperties->specularColor = glm::vec4(1.f, 1.f, 1.f, 1.f);
+    lightProperties->cLight = glm::vec4(1.f, 1.f, 1.f, 1.f);
 
     std::shared_ptr<Light> pointLight = std::make_shared<Light>(std::move(lightProperties));
     pointLight->SetPosition(glm::vec3(10.f, 10.f, 10.f));

@@ -35,9 +35,25 @@ uniform float quadraticAttenuation;
 
 uniform int lightingType;
 
+float calculateG(vec4 direction,vec4 N,float k){
+    
+    float G = dot(N,direction)/(dot(N,direction)*(1-k)+k);
+    
+    return G;
+    
+}
 
 vec4 pointLightSubroutine(vec4 worldPosition, vec3 worldNormal)
 {
+    
+    vec4 cBase = fragmentColor;
+    
+    vec4 cDiff = (1-material.matMetallic)*cBase;
+    
+    vec4 matSpecular2 = vec4(material.matSpecular,material.matSpecular,material.matSpecular,material.matSpecular);
+    
+    vec4 cSpec = mix(0.08*matSpecular2,cBase,material.matMetallic);
+    
     // Normal to the surface
     vec4 N = vec4(normalize(worldNormal), 0.f);
     
@@ -45,22 +61,42 @@ vec4 pointLightSubroutine(vec4 worldPosition, vec3 worldNormal)
     vec4 L = normalize(pointLight.pointPosition - worldPosition);
 
     // Direction from the surface to the eye
-    vec4 E = normalize(cameraPosition - worldPosition);
-
-    // Direction of maximum highlights (see paper!)
-    vec4 H = normalize(L + E);
-
-    // Amount of diffuse reflection
-    float d = max(0, dot(N, L));
-    vec4 diffuseColor = d * genericLight.diffuseColor * material.matRoughness;
+    vec4 V = normalize(cameraPosition - worldPosition);
     
-    // Amount of specular reflection
-    float s = pow(max(0, dot(N, H)), material.matSpecular);
-    vec4 specularColor = s * genericLight.specularColor * material.matSpecular;
+    // Direction of maximum highlights (see paper!)
+    vec4 H = normalize(L + V);
+    
+    float alpha = pow(material.matRoughness,2);
+    
+    float numerator = pow(dot(N,H),2) * (pow(alpha,2) - 1) + 1;
+    
+    float D = (pow(alpha,2))/(3.14159265358979323846 * pow(numerator,2));
+    
+    float k = pow(material.matRoughness + 1,2)/8;
 
-    return diffuseColor + specularColor;
+    float G = calculateG(L,N,k)*calculateG(V,N,k);
+    
+    float twoPow =(-5.55473 * dot(V,H)- 6.98316)* dot(V,H);
+
+    vec4 F = cSpec + (1-cSpec)*pow(2,twoPow);
+    
+    //final values of d and s
+                              
+    float d = float(cDiff/3.14159265358979323846);
+    
+    float s = float((D * F * G)/ (4*dot(N,L)*dot(N,V)));
+    
+    vec4 cLight = vec4(1.f,1.f,1.f,1.f);
+                              
+    vec4 cFinal = cLight*dot(N,L)*(d+s);
+
+    return cFinal;
+    
 }
 
+  
+
+                              
 vec4 globalLightSubroutine(vec4 worldPosition, vec3 worldNormal)
 {
     return vec4(0);
