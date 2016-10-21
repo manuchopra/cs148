@@ -94,8 +94,6 @@ vec4 pointLightSubroutine(vec4 worldPosition, vec3 worldNormal)
     
 }
 
-  
-
                               
 vec4 globalLightSubroutine(vec4 worldPosition, vec3 worldNormal)
 {
@@ -105,7 +103,10 @@ vec4 globalLightSubroutine(vec4 worldPosition, vec3 worldNormal)
 vec4 AttenuateLight(vec4 originalColor, vec4 worldPosition)
 {
     float lightDistance = length(pointLight.pointPosition - worldPosition);
-    float attenuation = 1.0 / (constantAttenuation + lightDistance * linearAttenuation + lightDistance * lightDistance * quadraticAttenuation);
+    
+    float numerator2 = clamp(1-pow(lightDistance/1000,4),0,1);
+    
+    float attenuation = float((numerator2 * numerator2) / (constantAttenuation + lightDistance * linearAttenuation + lightDistance * lightDistance * quadraticAttenuation));
     return originalColor * attenuation;
 }
 
