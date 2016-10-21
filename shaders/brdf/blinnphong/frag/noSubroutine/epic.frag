@@ -37,7 +37,7 @@ uniform int lightingType;
 
 float calculateG(vec4 direction,vec4 N,float k){
     
-    float G = dot(N,direction)/(dot(N,direction)*(1-k)+k);
+    float G = clamp(dot(N,direction),0,1)/(clamp(dot(N,direction),0,1)*(1-k)+k);
     
     return G;
     
@@ -68,7 +68,7 @@ vec4 pointLightSubroutine(vec4 worldPosition, vec3 worldNormal)
     
     float alpha = pow(material.matRoughness,2);
     
-    float numerator = pow(dot(N,H),2) * (pow(alpha,2) - 1) + 1;
+    float numerator = pow(clamp(dot(N,H),0,1),2) * (pow(alpha,2) - 1) + 1;
     
     float D = (pow(alpha,2))/(3.14159265358979323846 * pow(numerator,2));
     
@@ -76,7 +76,7 @@ vec4 pointLightSubroutine(vec4 worldPosition, vec3 worldNormal)
 
     float G = calculateG(L,N,k)*calculateG(V,N,k);
     
-    float twoPow =(-5.55473 * dot(V,H)- 6.98316)* dot(V,H);
+    float twoPow =(-5.55473 * clamp(dot(V,H),0,1)- 6.98316)* clamp(dot(V,H),0,1);
 
     vec4 F = cSpec + (1-cSpec)*pow(2,twoPow);
     
@@ -84,11 +84,11 @@ vec4 pointLightSubroutine(vec4 worldPosition, vec3 worldNormal)
                               
     float d = float(cDiff/3.14159265358979323846);
     
-    float s = float((D * F * G)/ (4*dot(N,L)*dot(N,V)));
+    float s = float((D * F * G)/ (4*clamp(dot(N,L),0,1)*clamp(dot(N,V),0,1)));
     
     vec4 cLight = vec4(1.f,1.f,1.f,1.f);
                               
-    vec4 cFinal = cLight*dot(N,L)*(d+s);
+    vec4 cFinal = cLight*clamp(dot(N,L),0,1)*(d+s);
 
     return cFinal;
     
