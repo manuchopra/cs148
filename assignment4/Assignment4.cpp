@@ -124,7 +124,7 @@ void Assignment4::SetupExample1()
     shader->SetRoughness(0.8f);
     
     std::unique_ptr<LightProperties> EpicLightProperties = make_unique<LightProperties>();
-    EpicLightProperties->cLight = glm::vec4(0.f, 0.f, 0.f, 0.f);
+    EpicLightProperties->cLight = glm::vec4(1.f, 1.f, 1.f, 1.f);
 
     pointLight = std::make_shared<Light>(std::move(EpicLightProperties));
     pointLight->SetPosition(glm::vec3(10.f, 10.f, 10.f));

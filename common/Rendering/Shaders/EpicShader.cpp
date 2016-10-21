@@ -16,7 +16,7 @@ std::array<const char*, 3> EpicShader::MATERIAL_PROPERTY_NAMES = {
 const int EpicShader::MATERIAL_BINDING_POINT = 0;
 
 EpicShader::EpicShader(const std::unordered_map<GLenum, std::string>& inputShaders, GLenum lightingStage):
-    ShaderProgram(inputShaders), roughness(1.f), specular(1.f), metallic(1.f),
+    ShaderProgram(inputShaders), roughness(0.8f), specular(100.f), metallic(0.9f),
 
 //ShaderProgram(inputShaders), diffuse(glm::vec3(0.f), 1.f), specular(glm::vec3(0.f), 1.f), shininess(1.f), ambient(glm::vec3(0.1f), 1.f),
 
