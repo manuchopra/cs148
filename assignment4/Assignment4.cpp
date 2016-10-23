@@ -122,34 +122,32 @@ void Assignment4::SetupExample1()
 
     std::shared_ptr<EpicShader> groundShader = std::make_shared<EpicShader>(shaderSpec, GL_FRAGMENT_SHADER);
     shader->SetRoughness(0.8f);
-    
+//    
     std::unique_ptr<LightProperties> EpicLightProperties = make_unique<LightProperties>();
     EpicLightProperties->cLight = glm::vec4(1.f, 1.f, 1.f, 1.f);
 
-    pointLight = std::make_shared<Light>(std::move(EpicLightProperties));
+    pointLight = std::make_shared<Light>(std::move(EpicLightProperties),Light::LightType::POINT);
     pointLight->SetPosition(glm::vec3(10.f, 10.f, 10.f));
-    scene->AddLight(pointLight);
+//    scene->AddLight(pointLight);
+    
+    std::unique_ptr<LightProperties> hemisphereLightProperties = make_unique<LightProperties>();
+    hemisphereLightProperties->sky_color = glm::vec4(0.7f, 0.2f, 0.0f, 1.f);
+    hemisphereLightProperties->ground_color = glm::vec4(0.f, 0.5f, 1.5f, 1.f);
+    
+    std::shared_ptr<class Light> hemisphereLight = std::make_shared<Light>(std::move(hemisphereLightProperties),Light::LightType::HEMISPHERE);
+    scene->AddLight(hemisphereLight);
+    
+    std::unique_ptr<LightProperties> directionalLightProperties = make_unique<LightProperties>();
+    directionalLightProperties->forward_direction = glm::vec4(1.f, -2.667, 33.612,1.f); //sunlight
+    directionalLightProperties->cLight = glm::vec4(1.f, 1.f, 1.f, 1.f);
+    
+    std::shared_ptr<class Light> directionalLight = std::make_shared<Light>(std::move(directionalLightProperties),Light::LightType::DIRECTIONAL);
+  // scene->AddLight(directionalLight);
+
 
     GenericSetupExample(shader, groundShader);
 
 }
-
-//std::shared_ptr<EpicShader> shader = std::make_shared<EpicShader>(shaderSpec, GL_FRAGMENT_SHADER);
-//shader->SetRO(glm::vec4(0.8f, 0.8f, 0.8f, 1.f));
-//shader->SetSpecular(glm::vec4(1.f, 1.f, 1.f, 1.f), 40.f);
-//
-//std::shared_ptr<EpicShader> groundShader = std::make_shared<EpicShader>(shaderSpec, GL_FRAGMENT_SHADER);
-//shader->SetDiffuse(glm::vec4(0.8f, 0.8f, 0.8f, 1.f));
-//
-//std::unique_ptr<LightProperties> EpicLightProperties = make_unique<LightProperties>();
-//EpicLightProperties->diffuseColor = glm::vec4(1.f, 1.f, 1.f, 1.f);
-//EpicLightProperties->specularColor = glm::vec4(1.f, 1.f, 1.f, 1.f);
-//
-//pointLight = std::make_shared<Light>(std::move(EpicLightProperties));
-//pointLight->SetPosition(glm::vec3(10.f, 10.f, 10.f));
-//scene->AddLight(pointLight);
-//
-//GenericSetupExample(shader, groundShader);
 
 
 void Assignment4::GenericSetupExample(std::shared_ptr<ShaderProgram> shader, std::shared_ptr<ShaderProgram> groundShader)

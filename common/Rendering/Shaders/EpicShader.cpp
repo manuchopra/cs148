@@ -16,9 +16,7 @@ std::array<const char*, 3> EpicShader::MATERIAL_PROPERTY_NAMES = {
 const int EpicShader::MATERIAL_BINDING_POINT = 0;
 
 EpicShader::EpicShader(const std::unordered_map<GLenum, std::string>& inputShaders, GLenum lightingStage):
-    ShaderProgram(inputShaders), roughness(0.8f), specular(100.f), metallic(0.9f),
-
-//ShaderProgram(inputShaders), diffuse(glm::vec3(0.f), 1.f), specular(glm::vec3(0.f), 1.f), shininess(1.f), ambient(glm::vec3(0.1f), 1.f),
+    ShaderProgram(inputShaders), roughness(0.8f), specular(100.f), metallic(1.f),
 
     materialBlockLocation(0), materialBlockSize(0), materialBuffer(0),
     lightingShaderStage(lightingStage), maxDisplacement(0.5f)
@@ -55,27 +53,31 @@ void EpicShader::SetupShaderLighting(const Light* light) const
         SetShaderUniform("lightingType", static_cast<int>(Light::LightType::GLOBAL));
 #endif
     } else {
+        
+        // Get the light's properties
+        const LightProperties* lightProperty = static_cast<const LightProperties*>(light->GetPropertiesRaw());
+
         // Select proper lighting subroutine based on the light's type.
         switch(light->GetLightType()) {
         case Light::LightType::POINT:
-#ifndef DISABLE_OPENGL_SUBROUTINES
-            SetShaderSubroutine("inputLightSubroutine", "pointLightSubroutine", lightingShaderStage);
-#else
             SetShaderUniform("lightingType", static_cast<int>(Light::LightType::POINT));
-#endif
+            break;
+        case Light::LightType::DIRECTIONAL:
+            SetShaderUniform("lightingType", static_cast<int>(Light::LightType::DIRECTIONAL));
+            SetShaderUniform("directionalLight.cLight", lightProperty->cLight);
+            SetShaderUniform("directionalLight.forward_direction", lightProperty->forward_direction);
+            break;
+        case Light::LightType::HEMISPHERE:
+            SetShaderUniform("hemisphereLight.sky_color", lightProperty->sky_color);
+            SetShaderUniform("hemisphereLight.ground_color", lightProperty->ground_color);
+            SetShaderUniform("lightingType", static_cast<int>(Light::LightType::HEMISPHERE));
             break;
         default:
             std::cerr << "WARNING: Light type is not supported. Defaulting to global light. Your output may look wrong. -- Ignoring: " << static_cast<int>(light->GetLightType()) << std::endl;
-#ifndef DISABLE_OPENGL_SUBROUTINES
-            SetShaderSubroutine("inputLightSubroutine", "globalLightSubroutine", lightingShaderStage);
-#else
             SetShaderUniform("lightingType", static_cast<int>(Light::LightType::GLOBAL));
-#endif
             break;
         }
 
-        // Get the light's properties and pass it into the shader.
-        const LightProperties* lightProperty = light->GetPropertiesRaw();
         SetShaderUniform("genericLight.cLight", lightProperty->cLight);
         light->SetupShaderUniforms(this);
     }
@@ -85,11 +87,7 @@ void EpicShader::SetupShaderLighting(const Light* light) const
 void EpicShader::UpdateMaterialBlock() const
 {
     StartUseShader();
-
-//    memcpy((void*)(materialStorage.data() + materialOffsets[0]), glm::value_ptr(diffuse), sizeof(glm::vec4));
-//    memcpy((void*)(materialStorage.data() + materialOffsets[1]), glm::value_ptr(specular), sizeof(glm::vec4));
-//    memcpy((void*)(materialStorage.data() + materialOffsets[2]), &shininess, sizeof(float));
-//    
+    
     memcpy((void*)(materialStorage.data() + materialOffsets[0]), &roughness, sizeof(float));
     memcpy((void*)(materialStorage.data() + materialOffsets[1]), &specular, sizeof(float));
     memcpy((void*)(materialStorage.data() + materialOffsets[2]), &metallic, sizeof(float));
@@ -185,24 +183,6 @@ void EpicShader::SetMetallic(float inMetallic)
     UpdateMaterialBlock();
 }
 
-//void EpicShader::SetRoughness(glm::vec4 inRoughness)
-//{
-//    diffuse = inDiffuse;
-//    UpdateMaterialBlock();
-//}
-//
-//void EpicShader::SetSpecular(glm::vec4 inSpecular, float inShininess)
-//{
-//    specular = inSpecular;
-//    shininess = inShininess;
-//    UpdateMaterialBlock();
-//}
-//
-//void EpicShader::SetAmbient(glm::vec4 inAmbient)
-//{
-//    ambient = inAmbient;
-//    UpdateMaterialBlock();
-//}
 
 void EpicShader::SetTexture(TextureSlots::Type slot, std::shared_ptr<class Texture> inputTexture)
 {

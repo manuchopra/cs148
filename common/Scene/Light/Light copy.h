@@ -22,9 +22,9 @@ public:
      */
     enum class LightType {
         GLOBAL = 0,
-        POINT,
-        DIRECTIONAL,
-        HEMISPHERE,
+        POINT = 1,
+        DIRECTIONAL = 2,
+        HEMISPHERE = 3,
         IBL
     };
 
@@ -54,7 +54,7 @@ public:
     void SetQuadraticAttenuation(float inValue);
 
     LightType GetLightType() const { return lightType; }
-    
+
     const struct LightProperties* GetPropertiesRaw() const;
     
     /*! \brief Sets up the shader to have the necessary properties for a given type of light.
