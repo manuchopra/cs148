@@ -143,6 +143,33 @@ void Assignment4::SetupExample1()
     
     std::shared_ptr<class Light> directionalLight = std::make_shared<Light>(std::move(directionalLightProperties),Light::LightType::DIRECTIONAL);
     scene->AddLight(directionalLight);
+    
+//    UNCOMMENT BELOW TO SEE 4.4 IN ACTION
+    
+//    //-----------------------SPHERE (ONLINE-MESH)-----------------------//
+//    
+//    std::vector<std::shared_ptr<RenderingObject>> sphereTemplate = MeshLoader::LoadMesh(shader, "sphere.obj");
+//    if (sphereTemplate.empty()) {
+//        std::cerr << "ERROR: Failed to load the model. Check your paths." << std::endl;
+//        return;
+//    }
+//    
+//    //--------------------WITCHER (ONLINE-MESH)--------------------//
+//    std::vector<std::shared_ptr<RenderingObject>> meshTemplate = MeshLoader::LoadMesh(shader, "witcher.obj");
+//    if (meshTemplate.empty()) {
+//        std::cerr << "ERROR: Failed to load the model. Check your paths." << std::endl;
+//        return;
+//    }
+//    //-------------------------------------------------------------//
+//    sceneObject = std::make_shared<SceneObject>(sphereTemplate);
+//    sceneObject2 = std::make_shared<SceneObject>(meshTemplate);
+//    
+//    sceneObject->MultScale(0.1);
+//    sceneObject2->MultScale(50.0);
+//    sceneObject2->SetPosition(glm::vec3(0.f, 0.f, 10.f));
+//    
+//    scene->AddSceneObject(sceneObject);
+//    scene->AddSceneObject(sceneObject2);
 
     GenericSetupExample(shader, groundShader);
 
@@ -151,45 +178,47 @@ void Assignment4::SetupExample1()
 
 void Assignment4::GenericSetupExample(std::shared_ptr<ShaderProgram> shader, std::shared_ptr<ShaderProgram> groundShader)
 {
-    std::shared_ptr<RenderingObject> sphereTemplate = PrimitiveCreator::CreateIcoSphere(shader, 5.f, 4);
-
-    // Give a R/G/B color to each vertex to visualize the sphere.
-    auto totalVertices = sphereTemplate->GetTotalVertices();
-
-    std::unique_ptr<RenderingObject::ColorArray> vertexColors = make_unique<RenderingObject::ColorArray>();
-    vertexColors->reserve(totalVertices);
-
-    for (decltype(totalVertices) i = 0; i < totalVertices; ++i) {
-        vertexColors->emplace_back(1.f, 1.f, 1.0f, 1.f);
-    }
-    sphereTemplate->SetVertexColors(std::move(vertexColors));
-
-    sphereDance.clear();
-    // 10x10 grid of spheres.
-    for (int x = 0; x < 10; ++x)  {
-        for (int y = 0; y < 10; ++y) {
-            std::shared_ptr<class SceneObject> sceneObject = std::make_shared<SceneObject>(sphereTemplate);
-            sceneObject->SetPosition(glm::vec3(x * 12.f, 0.f, y * 12.f));
-            scene->AddSceneObject(sceneObject);
-            sphereDance.push_back(sceneObject);
-        }
-    }
-
-    std::shared_ptr<RenderingObject> plane = PrimitiveCreator::CreatePlane(groundShader);
-    std::shared_ptr<class SceneObject> groundObject = std::make_shared<SceneObject>(plane);
-    groundObject->MultScale(150.f);
-    groundObject->SetPosition(glm::vec3(-10.f, 0.f, -10.f));
-    groundObject->Translate(glm::vec3(SceneObject::GetWorldUp() * -5.f));
-
-    std::unique_ptr<RenderingObject::ColorArray> groundColor = make_unique<RenderingObject::ColorArray>();
-    groundColor->reserve(4);
-
-    for (int i = 0; i < 4; ++i) {
-        groundColor->emplace_back(0.89, 0.349f, 0.f, 1.f);
-    }
-    plane->SetVertexColors(std::move(groundColor));
-
-    scene->AddSceneObject(groundObject);
+    
+    
+//    std::shared_ptr<RenderingObject> sphereTemplate = PrimitiveCreator::CreateIcoSphere(shader, 5.f, 4);
+//
+//    // Give a R/G/B color to each vertex to visualize the sphere.
+//    auto totalVertices = sphereTemplate->GetTotalVertices();
+//
+//    std::unique_ptr<RenderingObject::ColorArray> vertexColors = make_unique<RenderingObject::ColorArray>();
+//    vertexColors->reserve(totalVertices);
+//
+//    for (decltype(totalVertices) i = 0; i < totalVertices; ++i) {
+//        vertexColors->emplace_back(1.f, 1.f, 1.0f, 1.f);
+//    }
+//    sphereTemplate->SetVertexColors(std::move(vertexColors));
+//
+//    sphereDance.clear();
+//    // 10x10 grid of spheres.
+//    for (int x = 0; x < 10; ++x)  {
+//        for (int y = 0; y < 10; ++y) {
+//            std::shared_ptr<class SceneObject> sceneObject = std::make_shared<SceneObject>(sphereTemplate);
+//            sceneObject->SetPosition(glm::vec3(x * 12.f, 0.f, y * 12.f));
+//            scene->AddSceneObject(sceneObject);
+//            sphereDance.push_back(sceneObject);
+//        }
+//    }
+//
+//    std::shared_ptr<RenderingObject> plane = PrimitiveCreator::CreatePlane(groundShader);
+//    std::shared_ptr<class SceneObject> groundObject = std::make_shared<SceneObject>(plane);
+//    groundObject->MultScale(150.f);
+//    groundObject->SetPosition(glm::vec3(-10.f, 0.f, -10.f));
+//    groundObject->Translate(glm::vec3(SceneObject::GetWorldUp() * -5.f));
+//
+//    std::unique_ptr<RenderingObject::ColorArray> groundColor = make_unique<RenderingObject::ColorArray>();
+//    groundColor->reserve(4);
+//
+//    for (int i = 0; i < 4; ++i) {
+//        groundColor->emplace_back(0.89, 0.349f, 0.f, 1.f);
+//    }
+//    plane->SetVertexColors(std::move(groundColor));
+//
+//    scene->AddSceneObject(groundObject);
 }
 
 void Assignment4::Tick(double deltaTime)
