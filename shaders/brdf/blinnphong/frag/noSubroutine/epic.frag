@@ -105,7 +105,7 @@ vec4 pointLightSubroutine(vec4 worldPosition, vec3 worldNormal)
 
 vec4 directionalLightSubroutine(vec4 worldPosition, vec3 worldNormal)
 {
-    vec4 L = -directionalLight.forward_direction;
+    vec4 L = -normalize(directionalLight.forward_direction); //direction of the light - edited to seem like sunlight
     
     vec4 cLight = directionalLight.cLight; //light color
     
@@ -200,7 +200,7 @@ vec4 hemisphereLightSubroutine(vec4 worldPosition, vec3 worldNormal)
     
     float d = float(cDiff/3.14159265358979323846);
     
-    float s = float((D * F * G)/ 4*dot(L,L)*dot(L,V));
+    float s = float((D * F * G)/ (4*clamp(dot(L,L),0,1)*clamp(dot(L,V),0,1)));
     
     vec4 cFinal = cLight*clamp(dot(L,L),0,1)*(d+s);
     
@@ -230,11 +230,12 @@ void main()
         lightingColor = globalLightSubroutine(vertexWorldPosition, vertexWorldNormal);
     } else if (lightingType == 1) {
         lightingColor = pointLightSubroutine(vertexWorldPosition, vertexWorldNormal);
+        finalColor = AttenuateLight(lightingColor, vertexWorldPosition) * fragmentColor;
     } else if (lightingType == 2) {
         lightingColor = directionalLightSubroutine(vertexWorldPosition, vertexWorldNormal);
+        finalColor = lightingColor;
     } else if (lightingType == 3) {
         lightingColor = hemisphereLightSubroutine(vertexWorldPosition, vertexWorldNormal);
+        finalColor = lightingColor;
     }
-    
-    finalColor = AttenuateLight(lightingColor, vertexWorldPosition) * fragmentColor;
 }
