@@ -26,6 +26,9 @@ private:
     virtual void SetupExample1();
     virtual void SetupExample2();
     virtual void SetupCamera();
+    std::shared_ptr<class SceneObject> sceneObject;
+    std::shared_ptr<class SceneObject> sceneObject2;
+
 };
 
 #endif

@@ -30,6 +30,8 @@ glm::vec2 Assignment5::GetWindowSize() const
 void Assignment5::SetupScene()
 {
     SetupExample1();
+    SetupExample2();
+
 }
 
 void Assignment5::SetupCamera()
@@ -115,8 +117,6 @@ void Assignment5::SetupExample1()
     shader->SetDiffuse(glm::vec4(0.8f, 0.8f, 0.8f, 1.f));
     shader->SetTexture(BlinnPhongShader::TextureSlots::DIFFUSE, TextureLoader::LoadTexture("brick/bricktexture.jpg"));
     shader->SetTexture(BlinnPhongShader::TextureSlots::SPECULAR, TextureLoader::LoadTexture("brick/bricktexture.jpg"));
-    shader->SetTexture(BlinnPhongShader::TextureSlots::NORMAL, TextureLoader::LoadTexture("brick/bricktexture_norm.jpg"));
-    shader->SetTexture(BlinnPhongShader::TextureSlots::DISPLACEMENT, TextureLoader::LoadTexture("brick/bricktexture_displacement.jpg"));
     shader->SetMaxDisplacement(0.1f);
 
     std::unique_ptr<LightProperties> lightProperties = make_unique<LightProperties>();
@@ -126,13 +126,17 @@ void Assignment5::SetupExample1()
     pointLight->SetPosition(glm::vec3(10.f, 10.f, 10.f));
     scene->AddLight(pointLight);
 
-    std::vector<std::shared_ptr<RenderingObject>> sphereTemplate = MeshLoader::LoadMesh(shader, "sphere.obj");
-    for (size_t i = 0; i < sphereTemplate.size(); ++i) {
-        sphereTemplate[i]->ComputeTangentSpace();
-    }
+    std::vector<std::shared_ptr<RenderingObject>> meshTemplate = MeshLoader::LoadMesh(shader, "rocketfinal.obj");
 
-    std::shared_ptr<class SceneObject> sceneObject = std::make_shared<SceneObject>(sphereTemplate);
-    sceneObject->Rotate(glm::vec3(SceneObject::GetWorldRight()), PI / 4.f);
+    if (meshTemplate.empty()) {
+        std::cerr << "ERROR: Failed to load the model. Check your paths." << std::endl;
+        return;
+    }
+    
+    sceneObject = std::make_shared<SceneObject>(meshTemplate);
+        sceneObject->SetPosition(glm::vec3(0.f, 0.f, 5.f));
+        sceneObject->MultScale(0.5);
+
     scene->AddSceneObject(sceneObject);
 
 
@@ -140,12 +144,12 @@ void Assignment5::SetupExample1()
         { GL_VERTEX_SHADER, "cubemap/cubemap.vert" },
         { GL_FRAGMENT_SHADER, "cubemap/cubemap.frag" }
     };
-    std::shared_ptr<CubeMapTexture> skyboxTexture = TextureLoader::LoadCubeTexture("GrandCanyon_C_YumaPoint/cubemap/grandcanyone_c05.bmp", 
-        "GrandCanyon_C_YumaPoint/cubemap/grandcanyone_c01.bmp", 
-        "GrandCanyon_C_YumaPoint/cubemap/grandcanyone_c00.bmp", 
-        "GrandCanyon_C_YumaPoint/cubemap/grandcanyone_c02.bmp", 
-        "GrandCanyon_C_YumaPoint/cubemap/grandcanyone_c03.bmp", 
-        "GrandCanyon_C_YumaPoint/cubemap/grandcanyone_c04.bmp");
+    std::shared_ptr<CubeMapTexture> skyboxTexture = TextureLoader::LoadCubeTexture("GrandCanyon_C_YumaPoint/cubemap/zpos.png",
+        "GrandCanyon_C_YumaPoint/cubemap/xpos.png",
+        "GrandCanyon_C_YumaPoint/cubemap/xneg.png",
+        "GrandCanyon_C_YumaPoint/cubemap/yneg.png",
+        "GrandCanyon_C_YumaPoint/cubemap/ypos.png",
+        "GrandCanyon_C_YumaPoint/cubemap/zneg.png");
     std::shared_ptr<CubeMapShader> cubeShader = std::make_shared<CubeMapShader>(cubeShaderSpec, skyboxTexture);
     std::vector<std::shared_ptr<RenderingObject>> cubeTemplate = MeshLoader::LoadMesh(cubeShader, "cube.obj");
     for (size_t i = 0; i < cubeTemplate.size(); ++i) {
@@ -171,26 +175,75 @@ void Assignment5::SetupExample2()
         { GL_FRAGMENT_SHADER, "brdf/blinnphong/fragTexture/noSubroutine/blinnphong.frag" }
     };
 #endif
+    std::shared_ptr<BlinnPhongShader> shader = std::make_shared<BlinnPhongShader>(shaderSpec, GL_FRAGMENT_SHADER);
+    shader->SetDiffuse(glm::vec4(0.8f, 0.8f, 0.8f, 1.f));
+    shader->SetTexture(BlinnPhongShader::TextureSlots::DIFFUSE, TextureLoader::LoadTexture("brick/bricktexture4.jpg"));
+    shader->SetTexture(BlinnPhongShader::TextureSlots::SPECULAR, TextureLoader::LoadTexture("brick/bricktexture4.jpg"));
+    shader->SetMaxDisplacement(0.1f);
+    
     std::unique_ptr<LightProperties> lightProperties = make_unique<LightProperties>();
     lightProperties->cLight = glm::vec4(1.f, 1.f, 1.f, 1.f);
-
+    
     std::shared_ptr<Light> pointLight = std::make_shared<Light>(std::move(lightProperties));
     pointLight->SetPosition(glm::vec3(10.f, 10.f, 10.f));
     scene->AddLight(pointLight);
-
-    std::vector<std::shared_ptr<aiMaterial>> loadedMaterials;
-    std::vector<std::shared_ptr<RenderingObject>> sphereTemplate = MeshLoader::LoadMesh(nullptr, "sphere.obj", &loadedMaterials);
-    for (size_t i = 0; i < sphereTemplate.size(); ++i) {
-        std::shared_ptr<BlinnPhongShader> shader = std::make_shared<BlinnPhongShader>(shaderSpec, GL_FRAGMENT_SHADER);
-        shader->LoadMaterialFromAssimp(loadedMaterials[i]);
-        sphereTemplate[i]->SetShader(std::move(shader));
-
-        sphereTemplate[i]->ComputeTangentSpace();
+    
+    std::vector<std::shared_ptr<RenderingObject>> meshTemplate = MeshLoader::LoadMesh(shader, "A380.obj");
+    
+    if (meshTemplate.empty()) {
+        std::cerr << "ERROR: Failed to load the model. Check your paths." << std::endl;
+        return;
     }
-
-    std::shared_ptr<class SceneObject> sceneObject = std::make_shared<SceneObject>(sphereTemplate);
-    sceneObject->Rotate(glm::vec3(SceneObject::GetWorldRight()), PI / 4.f);
+    
+    sceneObject = std::make_shared<SceneObject>(meshTemplate);
+    sceneObject->SetPosition(glm::vec3(30.f, 30.f, -30.f));
+    sceneObject->MultScale(0.0000000000000000000000000005);
+    
     scene->AddSceneObject(sceneObject);
+    
+    std::shared_ptr<BlinnPhongShader> shader2 = std::make_shared<BlinnPhongShader>(shaderSpec, GL_FRAGMENT_SHADER);
+    shader2->SetDiffuse(glm::vec4(0.8f, 0.8f, 0.8f, 1.f));
+    shader2->SetTexture(BlinnPhongShader::TextureSlots::DIFFUSE, TextureLoader::LoadTexture("brick/bricktexture.jpg"));
+    shader2->SetTexture(BlinnPhongShader::TextureSlots::SPECULAR, TextureLoader::LoadTexture("brick/bricktexture.jpg"));
+    shader2->SetMaxDisplacement(0.1f);
+    
+
+    
+    std::vector<std::shared_ptr<RenderingObject>> meshTemplate2 = MeshLoader::LoadMesh(shader2, "rocketfinal.obj");
+    
+    if (meshTemplate.empty()) {
+        std::cerr << "ERROR: Failed to load the model. Check your paths." << std::endl;
+        return;
+    }
+    
+    sceneObject = std::make_shared<SceneObject>(meshTemplate2);
+    sceneObject->SetPosition(glm::vec3(0.f, 0.f, 5.f));
+    sceneObject->MultScale(0.2);
+    
+    scene->AddSceneObject(sceneObject);
+
+    
+    std::unordered_map<GLenum, std::string> cubeShaderSpec = {
+        { GL_VERTEX_SHADER, "cubemap/cubemap.vert" },
+        { GL_FRAGMENT_SHADER, "cubemap/cubemap.frag" }
+    };
+    std::shared_ptr<CubeMapTexture> skyboxTexture = TextureLoader::LoadCubeTexture("GrandCanyon_C_YumaPoint/cubemap/zpos.png",
+                                                                                   "GrandCanyon_C_YumaPoint/cubemap/xpos.png",
+                                                                                   "GrandCanyon_C_YumaPoint/cubemap/xneg.png",
+                                                                                   "GrandCanyon_C_YumaPoint/cubemap/yneg.png",
+                                                                                   "GrandCanyon_C_YumaPoint/cubemap/ypos.png",
+                                                                                   "GrandCanyon_C_YumaPoint/cubemap/zneg.png");
+    std::shared_ptr<CubeMapShader> cubeShader = std::make_shared<CubeMapShader>(cubeShaderSpec, skyboxTexture);
+    std::vector<std::shared_ptr<RenderingObject>> cubeTemplate = MeshLoader::LoadMesh(cubeShader, "cube.obj");
+    for (size_t i = 0; i < cubeTemplate.size(); ++i) {
+        cubeTemplate[i]->ReverseVertexOrder();
+    }
+    
+    std::shared_ptr<class SceneObject> cubeObject = std::make_shared<SceneObject>(cubeTemplate);
+    cubeObject->SetPosition(glm::vec3(0.f, 0.f, 2.f));
+    scene->AddSceneObject(cubeObject);
+
+
 }
 
 

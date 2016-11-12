@@ -201,7 +201,7 @@ vec4 hemisphereLightSubroutine(vec4 worldPosition, vec3 worldNormal)
     float d = float(cDiff/3.14159265358979323846);
     
     float s = float((D * F * G)/ (4*clamp(dot(L,L),0,1)*clamp(dot(L,V),0,1)));
-    
+        
     vec4 cFinal = cLight*clamp(dot(L,L),0,1)*(d+s);
     
     return cFinal;

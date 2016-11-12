@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef __LIGHT__
-#define __LIGHT__
+#ifndef __LIGHT1__
+#define __LIGHT1__
 
 #include "common/Scene/SceneObject.h"
 
@@ -37,43 +37,43 @@ public:
      */
     Light(std::unique_ptr<struct LightProperties> inProperties, LightType type = LightType::POINT);
     virtual ~Light();
-
-    /*! \brief Returns the attenuation parameters for the light.
-     *  \param constant Reference where the constant attenuation will be written to.
-     *  \param linear Reference where the linear attenuation will be written to.
-     *  \param quadratic Reference where the quadratic attenuation will be written to.
-     *
-     *  Let us define \f$d\f$ as the distance a vertex is from the light. Furthermore, let's define
-     *  \f$c\f$ as the constant attenuation, \f$l\f$ as the linear attenuation, and \f$q\f$ as the quadratic attenuation.
-     *  Then the light's intensity will be multiplied by \f$\frac{1}{c + d l + d^2 l}\f$.
-     */
-    void GetAttenuation(float& constant, float& linear, float& quadratic) const;
-
-    void SetConstantAttenuation(float inValue);
-    void SetLinearAttenuation(float inValue);
-    void SetQuadraticAttenuation(float inValue);
-
-    LightType GetLightType() const { return lightType; }
-
-    const struct LightProperties* GetPropertiesRaw() const;
-    
-    /*! \brief Sets up the shader to have the necessary properties for a given type of light.
-     *  \param program The shader to setup.
-     *  \warning Deprecated.
-     *
-     *  For a point light, the only thing that is necessary is the light's position.
-     */ 
-    virtual void SetupShaderUniforms(const class ShaderProgram* program) const;
-private:
-    static const std::string LIGHT_UNIFORM_NAME;
-    std::unique_ptr<struct LightProperties> properties;
-
-    LightType lightType;
-
-    // Attenuation
-    float constantAttenuation;
-    float linearAttenuation;
-    float quadraticAttenuation;
+//
+//    /*! \brief Returns the attenuation parameters for the light.
+//     *  \param constant Reference where the constant attenuation will be written to.
+//     *  \param linear Reference where the linear attenuation will be written to.
+//     *  \param quadratic Reference where the quadratic attenuation will be written to.
+//     *
+//     *  Let us define \f$d\f$ as the distance a vertex is from the light. Furthermore, let's define
+//     *  \f$c\f$ as the constant attenuation, \f$l\f$ as the linear attenuation, and \f$q\f$ as the quadratic attenuation.
+//     *  Then the light's intensity will be multiplied by \f$\frac{1}{c + d l + d^2 l}\f$.
+//     */
+//    void GetAttenuation(float& constant, float& linear, float& quadratic) const;
+//
+//    void SetConstantAttenuation(float inValue);
+//    void SetLinearAttenuation(float inValue);
+//    void SetQuadraticAttenuation(float inValue);
+//
+//    LightType GetLightType() const { return lightType; }
+//
+//    const struct LightProperties* GetPropertiesRaw() const;
+//    
+//    /*! \brief Sets up the shader to have the necessary properties for a given type of light.
+//     *  \param program The shader to setup.
+//     *  \warning Deprecated.
+//     *
+//     *  For a point light, the only thing that is necessary is the light's position.
+//     */ 
+//    virtual void SetupShaderUniforms(const class ShaderProgram* program) const;
+//private:
+//    static const std::string LIGHT_UNIFORM_NAME;
+//    std::unique_ptr<struct LightProperties> properties;
+//
+//    LightType lightType;
+//
+//    // Attenuation
+//    float constantAttenuation;
+//    float linearAttenuation;
+//    float quadraticAttenuation;
 };
 
 #endif
